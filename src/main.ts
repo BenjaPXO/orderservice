@@ -1,0 +1,64 @@
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  // Security
+  app.use(helmet());
+  app.use(cookieParser());
+
+  // CORS
+  app.enableCors({
+    origin: configService.get<string>('APP_CORS_ORIGIN', 'http://localhost:5173'),
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  });
+
+  // Global prefix
+  app.setGlobalPrefix('api');
+
+  // Global pipes
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  // Global filters
+  app.useGlobalFilters(new HttpExceptionFilter());
+
+  // Global interceptors
+  app.useGlobalInterceptors(new ResponseInterceptor());
+
+  // Swagger
+  if (configService.get<string>('NODE_ENV') !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('PXO Exchange API')
+      .setDescription('Backend API for PXO crypto exchange platform')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addCookieAuth('pxo_jwt')
+      .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+  }
+
+  const port = configService.get<number>('PORT', 3000);
+  await app.listen(port);
+  console.log(`🚀 PXO Backend running on http://localhost:${port}/api`);
+  console.log(`📚 Swagger docs at http://localhost:${port}/api/docs`);
+}
+
+bootstrap();

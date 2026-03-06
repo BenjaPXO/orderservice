@@ -9,9 +9,9 @@ export class BinanceService {
   private readonly secretKey: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.baseUrl = configService.get<string>('BINANCE_API_BASE_URL', 'https://api.binance.com/api/v3');
-    this.apiKey = configService.get<string>('BINANCE_API_KEY', '');
-    this.secretKey = configService.get<string>('BINANCE_SECRET_KEY', '');
+    this.baseUrl = configService.get<string>('binance.baseUrl') ?? 'https://api.binance.com/api/v3';
+    this.apiKey = configService.get<string>('binance.apiKey') ?? '';
+    this.secretKey = configService.get<string>('binance.secretKey') ?? '';
   }
 
   private sign(queryString: string): string {

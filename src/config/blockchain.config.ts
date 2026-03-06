@@ -7,4 +7,7 @@ export default registerAs('blockchain', () => ({
   encrypterPrivateKey: process.env.ENCRYPTER_PRIVATE_KEY,
   walletPrivateKeyEncrypted: process.env.WALLET_PRIVATE_KEY_ENCRYPTED,
   walletPrivateKey: process.env.WALLET_PRIVATE_KEY, // solo dev
+  depositWalletAddress: process.env.DEPOSIT_WALLET_ADDRESS,
+  polygonRpcUrl: process.env.POLYGON_RPC_URL,
+  chainId: parseInt(process.env.PLATFORM_CHAIN_ID ?? '137', 10),
 }));

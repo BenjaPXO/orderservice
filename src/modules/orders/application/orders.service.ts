@@ -23,7 +23,7 @@ export class OrdersService {
     depositWallet: string;
   }> {
     const order = await this.createOrderUseCase.execute(input);
-    const depositWallet = this.configService.get<string>('DEPOSIT_WALLET_ADDRESS') ?? '';
+    const depositWallet = this.configService.get<string>('blockchain.depositWalletAddress') ?? '';
     return { orderId: order.id, status: order.status, depositWallet };
   }
 

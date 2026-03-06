@@ -18,7 +18,7 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: configService.get<string>('APP_CORS_ORIGIN', 'http://localhost:5173'),
+    origin: configService.get<string>('app.corsOrigin'),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
@@ -42,7 +42,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor());
 
   // Swagger
-  if (configService.get<string>('NODE_ENV') !== 'production') {
+  if (configService.get<string>('app.nodeEnv') !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('PXO Exchange API')
       .setDescription('Backend API for PXO crypto exchange platform')
@@ -55,7 +55,7 @@ async function bootstrap() {
     SwaggerModule.setup('api/docs', app, document);
   }
 
-  const port = configService.get<number>('PORT', 3000);
+  const port = configService.get<number>('app.port') ?? 3000;
   await app.listen(port);
   console.log(`🚀 PXO Backend running on http://localhost:${port}/api`);
   console.log(`📚 Swagger docs at http://localhost:${port}/api/docs`);

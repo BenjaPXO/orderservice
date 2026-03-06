@@ -6,17 +6,24 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { OrderType } from '../../domain/enums/order-type.enum';
+import { OrderStatus } from '../../domain/enums/order-status.enum';
 
 @Entity('orders')
 export class OrderOrmEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar' })
-  type: string;
+  @Column({ type: 'enum', enum: OrderType, enumName: 'order_type_enum' })
+  type: OrderType;
 
-  @Column({ type: 'varchar', default: 'CREATED' })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: OrderStatus,
+    enumName: 'order_status_enum',
+    default: OrderStatus.CREATED,
+  })
+  status: OrderStatus;
 
   @Column({ name: 'input_token', type: 'varchar' })
   inputToken: string;

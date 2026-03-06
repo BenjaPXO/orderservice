@@ -10,6 +10,7 @@ import databaseConfig from './config/database.config';
 import thirdwebConfig from './config/thirdweb.config';
 import blockchainConfig from './config/blockchain.config';
 import redisConfig from './config/redis.config';
+import binanceConfig from './config/binance.config';
 
 // Modules
 import { OrdersModule } from './modules/orders/orders.module';
@@ -22,7 +23,7 @@ import { HealthModule } from './modules/health/health.module';
     // Config global
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, thirdwebConfig, blockchainConfig, redisConfig],
+      load: [appConfig, databaseConfig, thirdwebConfig, blockchainConfig, redisConfig, binanceConfig],
       envFilePath: '.env',
     }),
 
@@ -30,17 +31,8 @@ import { HealthModule } from './modules/health/health.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService): TypeOrmModuleOptions => ({
-        type: 'postgres',
-        url: config.get<string>('DATABASE_URL'),
-        ssl:
-          config.get<string>('DATABASE_SSL') === 'true'
-            ? { rejectUnauthorized: false }
-            : false,
-        synchronize: false,
-        autoLoadEntities: true,
-        logging: config.get<string>('NODE_ENV') === 'development',
-      }),
+      useFactory: (config: ConfigService): TypeOrmModuleOptions =>
+        config.get<TypeOrmModuleOptions>('database') as TypeOrmModuleOptions,
     }),
 
     // Queue (BullMQ + Redis)
@@ -49,7 +41,7 @@ import { HealthModule } from './modules/health/health.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         connection: {
-          url: config.get<string>('REDIS_URL') ?? 'redis://localhost:6379',
+          url: config.get<string>('redis.url'),
         },
       }),
     }),

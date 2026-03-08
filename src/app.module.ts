@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BullModule } from '@nestjs/bullmq';
+// import { BullModule } from '@nestjs/bullmq'; // TODO: re-enable when Redis is ready
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 // Config
@@ -35,16 +35,8 @@ import { HealthModule } from './modules/health/health.module';
         config.get<TypeOrmModuleOptions>('database') as TypeOrmModuleOptions,
     }),
 
-    // Queue (BullMQ + Redis)
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        connection: {
-          url: config.get<string>('redis.url'),
-        },
-      }),
-    }),
+    // Queue (BullMQ + Redis) — TODO: re-enable when Redis is ready
+    // BullModule.forRootAsync({ ... }),
 
     // Feature modules
     OrdersModule,

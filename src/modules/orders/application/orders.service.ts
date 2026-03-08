@@ -1,20 +1,23 @@
-import { Injectable } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+// import { InjectQueue } from '@nestjs/bullmq'; // TODO: re-enable when Redis is ready
+// import { Queue } from 'bullmq';
 import { ConfigService } from '@nestjs/config';
 import { CreateOrderUseCase, CreateOrderInput } from '../domain/use-cases/create-order.use-case';
 import { NotifyTxHashUseCase } from '../domain/use-cases/notify-tx-hash.use-case';
 import { Order } from '../domain/entities/order.entity';
+import { IOrderRepository, ORDER_REPOSITORY } from '../domain/repositories/order.repository.interface';
 
 export const ORDER_QUEUE = 'order-processing';
 
 @Injectable()
 export class OrdersService {
   constructor(
-    @InjectQueue(ORDER_QUEUE) private readonly orderQueue: Queue,
+    // @InjectQueue(ORDER_QUEUE) private readonly orderQueue: Queue, // TODO: re-enable when Redis is ready
     private readonly createOrderUseCase: CreateOrderUseCase,
     private readonly notifyTxHashUseCase: NotifyTxHashUseCase,
     private readonly configService: ConfigService,
+    @Inject(ORDER_REPOSITORY)
+    private readonly orderRepository: IOrderRepository,
   ) {}
 
   async createOrder(input: CreateOrderInput): Promise<{
@@ -28,22 +31,19 @@ export class OrdersService {
   }
 
   async getOrder(orderId: string): Promise<Order> {
-    // TODO: inject GetOrderUseCase and call execute(orderId)
-    throw new Error('Not implemented');
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) throw new NotFoundException(`Order ${orderId} not found`);
+    return order;
   }
 
   async notifyTxHash(orderId: string, txHash: string): Promise<Order> {
     const order = await this.notifyTxHashUseCase.execute(orderId, txHash);
-    // Enqueue job — jobId = orderId for deterministic deduplication
-    await this.orderQueue.add(
-      'process-order',
-      { orderId: order.id },
-      {
-        jobId: order.id,
-        attempts: 3,
-        backoff: { type: 'exponential', delay: 1000 },
-      },
-    );
+    // TODO: re-enable queue when Redis is ready
+    // await this.orderQueue.add('process-order', { orderId: order.id }, {
+    //   jobId: order.id,
+    //   attempts: 3,
+    //   backoff: { type: 'exponential', delay: 1000 },
+    // });
     return order;
   }
 }

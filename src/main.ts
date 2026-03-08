@@ -47,8 +47,7 @@ async function bootstrap() {
       .setTitle('PXO Exchange API')
       .setDescription('Backend API for PXO crypto exchange platform')
       .setVersion('1.0')
-      .addBearerAuth()
-      .addCookieAuth('pxo_jwt')
+      .addApiKey({ type: 'apiKey', in: 'header', name: 'x-api-key' }, 'x-api-key')
       .build();
 
     const document = SwaggerModule.createDocument(app, config);

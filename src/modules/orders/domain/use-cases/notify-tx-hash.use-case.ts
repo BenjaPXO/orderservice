@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Order } from '../entities/order.entity';
 import { OrderStatus } from '../enums/order-status.enum';
 import {
@@ -14,11 +14,14 @@ export class NotifyTxHashUseCase {
   ) {}
 
   async execute(orderId: string, txHash: string): Promise<Order> {
-    // TODO: implement
-    // 1. findById(orderId) — throw NotFoundException if not found
-    // 2. validate order.status === CREATED (can't re-notify)
-    // 3. updateStatus(orderId, AWAITING_TRANSFER, { txHashUser: txHash })
-    // 4. return updated order
-    throw new Error('Not implemented');
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) throw new NotFoundException(`Order ${orderId} not found`);
+    if (order.status !== OrderStatus.CREATED) {
+      throw new BadRequestException(`Order already in status ${order.status}`);
+    }
+    await this.orderRepository.updateStatus(orderId, OrderStatus.AWAITING_TRANSFER, {
+      txHashUser: txHash,
+    });
+    return this.orderRepository.findById(orderId) as Promise<Order>;
   }
 }

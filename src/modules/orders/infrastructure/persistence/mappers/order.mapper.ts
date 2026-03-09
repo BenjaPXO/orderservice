@@ -15,6 +15,7 @@ export class OrderMapper {
     order.userWallet = orm.userWallet;
     order.txHashUser = orm.txHashUser;
     order.txHashSettlement = orm.txHashSettlement;
+    order.binanceOrderId = orm.binanceOrderId;
     order.errorMessage = orm.errorMessage;
     order.createdAt = orm.createdAt;
     order.updatedAt = orm.updatedAt;
@@ -32,6 +33,7 @@ export class OrderMapper {
     if (order.userWallet !== undefined) orm.userWallet = order.userWallet;
     if (order.txHashUser !== undefined) orm.txHashUser = order.txHashUser;
     if (order.txHashSettlement !== undefined) orm.txHashSettlement = order.txHashSettlement;
+    if (order.binanceOrderId !== undefined) orm.binanceOrderId = order.binanceOrderId;
     if (order.errorMessage !== undefined) orm.errorMessage = order.errorMessage;
     return orm;
   }

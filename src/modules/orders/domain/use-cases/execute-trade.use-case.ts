@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   BINANCE_TRADER,
   IBinanceTrader,
@@ -13,6 +13,8 @@ import { Order } from '../entities/order.entity';
 
 @Injectable()
 export class ExecuteTradeUseCase {
+  private readonly logger = new Logger(ExecuteTradeUseCase.name);
+
   constructor(
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepository,
@@ -21,16 +23,23 @@ export class ExecuteTradeUseCase {
   ) {}
 
   async execute(order: Order): Promise<void> {
-    // TODO: implement
-    // BUY  flow: user sent USDt → sell USDt → MXN on Binance
-    //   symbol='USDTMXN', side='SELL', quantity=order.amount
-    // SELL flow: user sent PXO → buy USDt ← MXN on Binance
-    //   symbol='USDTMXN', side='BUY', quantity=order.amount
-    //
-    // 1. determine symbol + side from order.type
-    // 2. result = await binanceTrader.executeMarketOrder(symbol, side, order.amount)
-    // 3. updateStatus(order.id, PROCESSING, { binanceOrderId: result.orderId }) — add binanceOrderId to schema if needed
-    // 4. on error: updateStatus(order.id, FAILED, { errorMessage }) + throw to trigger retry
-    throw new Error('Not implemented');
+    const { symbol, side } = order.type === OrderType.BUY
+      ? { symbol: 'USDTMXN', side: 'SELL' as const }
+      : { symbol: 'USDTMXN', side: 'BUY' as const };
+
+    try {
+      const result = await this.binanceTrader.executeMarketOrder(symbol, side, order.amount);
+      this.logger.log(`Trade executed — binanceOrderId=${result.orderId} executedQty=${result.executedQty}`);
+      await this.orderRepository.updateStatus(order.id, OrderStatus.PROCESSING, {
+        binanceOrderId: result.orderId,
+      });
+    } catch (error) {
+      const binanceMsg = (error as any).response?.data?.msg ?? (error as Error).message;
+      this.logger.error(`Trade FAILED for order ${order.id}: ${binanceMsg}`);
+      await this.orderRepository.updateStatus(order.id, OrderStatus.FAILED, {
+        errorMessage: `Binance trade failed: ${binanceMsg}`,
+      });
+      throw error; // re-throw so BullMQ retries (attempts: 3, backoff: exponential)
+    }
   }
 }

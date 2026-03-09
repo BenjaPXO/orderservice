@@ -12,21 +12,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  // Security
   app.use(helmet());
   app.use(cookieParser());
 
-  // CORS
   app.enableCors({
     origin: configService.get<string>('app.corsOrigin'),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
 
-  // Global prefix
   app.setGlobalPrefix('api');
 
-  // Global pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -35,13 +31,8 @@ async function bootstrap() {
     }),
   );
 
-  // Global filters
   app.useGlobalFilters(new HttpExceptionFilter());
-
-  // Global interceptors
   app.useGlobalInterceptors(new ResponseInterceptor());
-
-  // Swagger
   if (configService.get<string>('app.nodeEnv') !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('PXO Exchange API')

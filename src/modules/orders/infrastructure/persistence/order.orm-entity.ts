@@ -44,6 +44,9 @@ export class OrderOrmEntity {
   @Column({ name: 'tx_hash_settlement', type: 'varchar', nullable: true })
   txHashSettlement: string | null;
 
+  @Column({ name: 'binance_order_id', type: 'varchar', nullable: true })
+  binanceOrderId: string | null;
+
   @Column({ name: 'error_message', type: 'text', nullable: true })
   errorMessage: string | null;
 

@@ -71,6 +71,11 @@ export class BinanceService {
     };
   }
 
+  async ping(): Promise<boolean> {
+    await firstValueFrom(this.httpService.get(`${this.baseUrl}/ping`));
+    return true;
+  }
+
   async getPrice(symbol: string): Promise<{ symbol: string; price: string }> {
     const { data } = await firstValueFrom(
       this.httpService.get(`${this.baseUrl}/ticker/price`, { params: { symbol } }),

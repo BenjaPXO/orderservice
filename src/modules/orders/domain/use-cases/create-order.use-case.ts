@@ -23,10 +23,13 @@ export class CreateOrderUseCase {
   ) {}
 
   async execute(input: CreateOrderInput): Promise<Order> {
-    // TODO: implement
-    // 1. validate amount > 0 and userWallet is a valid ETH address
-    // 2. save new Order with status CREATED
-    // 3. return saved Order
-    throw new Error('Not implemented');
+    return this.orderRepository.save({
+      type: input.type,
+      inputToken: input.inputToken,
+      outputToken: input.outputToken,
+      amount: input.amount,
+      userWallet: input.userWallet,
+      status: OrderStatus.CREATED,
+    });
   }
 }

@@ -16,12 +16,12 @@ export class BinanceHttpAdapter implements IBinanceTrader {
     side: 'BUY' | 'SELL',
     quantity: number,
   ): Promise<MarketOrderResult> {
-    // TODO: implement
-    // 1. Call this.binanceService.createOrder({ symbol, side, type: 'MARKET', quantity })
-    // 2. binanceService.createOrder() handles HMAC signing via sign()
-    // 3. Parse response: { orderId, executedQty, status }
-    // 4. Return MarketOrderResult
-    this.logger.warn(`executeMarketOrder not implemented — ${side} ${quantity} ${symbol}`);
-    throw new Error('Not implemented');
+    this.logger.log(`Executing market order: ${side} ${quantity} ${symbol}`);
+    const result = await this.binanceService.createOrder({ symbol, side, type: 'MARKET', quantity });
+    return {
+      orderId: result.orderId,
+      executedQty: result.executedQty,
+      status: result.status,
+    };
   }
 }

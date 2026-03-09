@@ -12,6 +12,7 @@ export class Order {
   userWallet: string;
   txHashUser: string | null;
   txHashSettlement: string | null;
+  binanceOrderId: string | null;
   errorMessage: string | null;
   createdAt: Date;
   updatedAt: Date;

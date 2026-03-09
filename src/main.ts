@@ -12,21 +12,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  // Security
   app.use(helmet());
   app.use(cookieParser());
 
-  // CORS
   app.enableCors({
     origin: configService.get<string>('app.corsOrigin'),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
 
-  // Global prefix
   app.setGlobalPrefix('api');
 
-  // Global pipes
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -35,20 +31,14 @@ async function bootstrap() {
     }),
   );
 
-  // Global filters
   app.useGlobalFilters(new HttpExceptionFilter());
-
-  // Global interceptors
   app.useGlobalInterceptors(new ResponseInterceptor());
-
-  // Swagger
   if (configService.get<string>('app.nodeEnv') !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('PXO Exchange API')
       .setDescription('Backend API for PXO crypto exchange platform')
       .setVersion('1.0')
-      .addBearerAuth()
-      .addCookieAuth('pxo_jwt')
+      .addApiKey({ type: 'apiKey', in: 'header', name: 'x-api-key' }, 'x-api-key')
       .build();
 
     const document = SwaggerModule.createDocument(app, config);

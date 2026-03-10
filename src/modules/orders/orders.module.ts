@@ -5,6 +5,7 @@ import { OrderOrmEntity } from './infrastructure/persistence/order.orm-entity';
 import { OrderTypeOrmRepository } from './infrastructure/persistence/order.typeorm.repository';
 import { ORDER_REPOSITORY } from './domain/repositories/order.repository.interface';
 import { CreateOrderUseCase } from './domain/use-cases/create-order.use-case';
+import { GetOrderUseCase } from './domain/use-cases/get-order.use-case';
 import { NotifyTxHashUseCase } from './domain/use-cases/notify-tx-hash.use-case';
 import { VerifyOnchainUseCase } from './domain/use-cases/verify-onchain.use-case';
 import { ExecuteTradeUseCase } from './domain/use-cases/execute-trade.use-case';
@@ -28,6 +29,7 @@ import { PricingModule } from '../pricing/pricing.module';
   providers: [
     { provide: ORDER_REPOSITORY, useClass: OrderTypeOrmRepository },
     CreateOrderUseCase,
+    GetOrderUseCase,
     NotifyTxHashUseCase,
     VerifyOnchainUseCase,
     ExecuteTradeUseCase,

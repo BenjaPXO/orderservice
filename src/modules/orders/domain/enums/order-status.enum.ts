@@ -5,4 +5,5 @@ export enum OrderStatus {
   PROCESSING = 'PROCESSING',
   SETTLED = 'SETTLED',
   FAILED = 'FAILED',
+  EXPIRED = 'EXPIRED',
 }

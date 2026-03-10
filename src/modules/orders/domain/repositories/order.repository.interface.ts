@@ -11,4 +11,5 @@ export interface IOrderRepository {
     status: OrderStatus,
     extra?: Partial<Order>,
   ): Promise<void>;
+  findExpiredOrders(): Promise<Order[]>;
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { IOrderRepository } from '../../domain/repositories/order.repository.interface';
 import { Order } from '../../domain/entities/order.entity';
 import { OrderStatus } from '../../domain/enums/order-status.enum';
@@ -34,5 +34,13 @@ export class OrderTypeOrmRepository implements IOrderRepository {
       status,
       ...(extra ? OrderMapper.toOrm(extra) : {}),
     });
+  }
+
+  async findExpiredOrders(): Promise<Order[]> {
+    const cutoff = new Date(Date.now() - 30 * 60 * 1000);
+    const orms = await this.repo.find({
+      where: { status: OrderStatus.CREATED, createdAt: LessThan(cutoff) },
+    });
+    return orms.map(OrderMapper.toDomain);
   }
 }

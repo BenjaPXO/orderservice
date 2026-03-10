@@ -1,11 +1,11 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 // import { InjectQueue } from '@nestjs/bullmq'; // TODO: re-enable when Redis is ready
 // import { Queue } from 'bullmq';
-import { ConfigService } from '@nestjs/config';
 import { CreateOrderUseCase, CreateOrderInput } from '../domain/use-cases/create-order.use-case';
 import { NotifyTxHashUseCase } from '../domain/use-cases/notify-tx-hash.use-case';
 import { Order } from '../domain/entities/order.entity';
 import { IOrderRepository, ORDER_REPOSITORY } from '../domain/repositories/order.repository.interface';
+import { CreateOrderResponseDto } from '../infrastructure/http/dto/create-order.response.dto';
 
 export const ORDER_QUEUE = 'order-processing';
 
@@ -15,19 +15,22 @@ export class OrdersService {
     // @InjectQueue(ORDER_QUEUE) private readonly orderQueue: Queue, // TODO: re-enable when Redis is ready
     private readonly createOrderUseCase: CreateOrderUseCase,
     private readonly notifyTxHashUseCase: NotifyTxHashUseCase,
-    private readonly configService: ConfigService,
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepository,
   ) {}
 
-  async createOrder(input: CreateOrderInput): Promise<{
-    orderId: string;
-    status: string;
-    depositWallet: string;
-  }> {
+  async createOrder(input: CreateOrderInput): Promise<CreateOrderResponseDto> {
     const order = await this.createOrderUseCase.execute(input);
-    const depositWallet = this.configService.get<string>('blockchain.depositWalletAddress') ?? '';
-    return { orderId: order.id, status: order.status, depositWallet };
+    return {
+      orderId: order.id,
+      depositAddress: order.depositAddress,
+      inputToken: order.inputToken,
+      outputToken: order.outputToken,
+      amount: order.amount,
+      quotePrice: order.quotePrice,
+      spread: order.spread,
+      quoteExpiresAt: order.quoteExpiresAt,
+    };
   }
 
   async getOrder(orderId: string): Promise<Order> {

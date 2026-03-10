@@ -14,6 +14,7 @@ import { OrdersController } from './infrastructure/http/orders.controller';
 import { OrderProcessingProcessor } from './infrastructure/queue/order-processing.processor';
 import { BlockchainModule } from '../blockchain/blockchain.module';
 import { BinanceModule } from '../binance/binance.module';
+import { PricingModule } from '../pricing/pricing.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { BinanceModule } from '../binance/binance.module';
     // BullModule.registerQueue({ name: ORDER_QUEUE }), // TODO: re-enable when Redis is ready
     BlockchainModule,
     BinanceModule,
+    PricingModule,
   ],
   controllers: [OrdersController],
   providers: [

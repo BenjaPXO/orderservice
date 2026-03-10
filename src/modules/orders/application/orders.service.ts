@@ -22,13 +22,10 @@ export class OrdersService {
     const order = await this.createOrderUseCase.execute(input);
     return {
       orderId: order.id,
-      depositAddress: order.depositAddress,
-      inputToken: order.inputToken,
-      outputToken: order.outputToken,
+      depositWallet: order.depositAddress,
+      token: order.inputToken,
       amount: order.amount,
       quotePrice: order.quotePrice,
-      spread: order.spread,
-      quoteExpiresAt: order.quoteExpiresAt,
     };
   }
 

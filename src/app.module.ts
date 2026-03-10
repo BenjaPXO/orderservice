@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 // import { BullModule } from '@nestjs/bullmq'; // TODO: re-enable when Redis is ready
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
@@ -30,6 +31,8 @@ import { HealthModule } from './modules/health/health.module';
       useFactory: (config: ConfigService): TypeOrmModuleOptions =>
         config.get<TypeOrmModuleOptions>('database') as TypeOrmModuleOptions,
     }),
+
+    ScheduleModule.forRoot(),
 
     // TODO: re-enable BullMQ when Redis is ready
     // BullModule.forRootAsync({ ... }),

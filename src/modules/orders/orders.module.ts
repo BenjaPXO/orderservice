@@ -13,6 +13,7 @@ import { ExecuteSettlementUseCase } from './domain/use-cases/execute-settlement.
 import { OrdersService } from './application/orders.service';
 import { OrdersController } from './infrastructure/http/orders.controller';
 import { OrderProcessingProcessor } from './infrastructure/queue/order-processing.processor';
+import { OrderExpirationCron } from './infrastructure/cron/order-expiration.cron';
 import { BlockchainModule } from '../blockchain/blockchain.module';
 import { BinanceModule } from '../binance/binance.module';
 import { PricingModule } from '../pricing/pricing.module';
@@ -36,6 +37,7 @@ import { PricingModule } from '../pricing/pricing.module';
     ExecuteSettlementUseCase,
     OrdersService,
     OrderProcessingProcessor,
+    OrderExpirationCron,
   ],
 })
 export class OrdersModule {}

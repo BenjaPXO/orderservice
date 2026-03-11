@@ -12,7 +12,7 @@ export default registerAs(
         : false,
     synchronize: false, // NUNCA true en produccion — usar migraciones
     autoLoadEntities: true,
-    logging: process.env.NODE_ENV === 'development',
+    logging: process.env.DB_LOGGING === 'true',
     migrations: ['dist/database/migrations/*.js'],
   }),
 );
